@@ -1,0 +1,72 @@
+org: andrewcbuensalida
+app: aws-node-http-api-project
+service: aws-node-http-api-project
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-west-1
+  lambdaHashingVersion: '20201221'
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  create:
+    handler: users/create.create
+    events:
+      - httpApi:
+          path: /users
+          method: post
+
+  list:
+    handler: users/list.list
+    events:
+      - httpApi:
+          path: /users
+          method: get
+
+  get:
+    handler: users/get.get
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: get
+
+  update:
+    handler: users/update.update
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: put
+
+resources:
+  Resources:
+    UsersDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
