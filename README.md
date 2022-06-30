@@ -12,8 +12,9 @@ Now you can test your endpoint in wsl with
 
 To destroy resources, cd into serverless folder, then 
     serverless remove
-    OR
-    sls remove
+    OR more specifically
+    serverless remove --stage dev --region us-east-1
+    
 
 ////////////////////////////
 workflow
@@ -24,12 +25,14 @@ when testing the lambda in aws console, event json has to be in the format below
         "body": "{\"username\": \"George123\"}"
     }
 
-when testing locally,
-    serverless invoke local --function <function name>
+when testing locally, event.json is the test inputs
+    serverless invoke local --function <function name eg. create> --path event.json
 
 To deploy only a specific function
     serverless deploy --function <function name eg. delete>
     
+But if changing the serverless.yml, need to do
+    serverless deploy
 
 ////////////////////////////////////////
 if you do serverless deploy again before you serverless remove, it won't double the resources, it won't remove the existing resources, just the existing lambdas. It doesn't change the endpoint.
