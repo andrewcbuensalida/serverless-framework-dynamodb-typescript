@@ -1,37 +1,25 @@
 "use strict";
-const AWS = require("aws-sdk"); // eslint-disable-line import/no-extraneous-dependencies
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-module.exports.update = (event, context, callback) => {
-    const timestamp = new Date().getTime();
-    const data = JSON.parse(event.body);
-    // validation
-    if (typeof data.username !== "string" ||
-        typeof data.checked !== "boolean") {
-        console.error("Validation Failed");
-        callback(null, {
-            statusCode: 400,
-            headers: { "Content-Type": "text/plain" },
-            body: "Couldn't update the user item.",
-        });
-        return;
-    }
+Object.defineProperty(exports, "__esModule", { value: true });
+const aws_sdk_1 = require("aws-sdk");
+const dynamoDb = new aws_sdk_1.DynamoDB.DocumentClient();
+module.exports.delete = (event, context, callback) => {
     const params = {
         TableName: process.env.DYNAMODB_TABLE,
         Key: {
             id: event.pathParameters.id,
         },
+        //#id gets assigned to the string id, #id replaces #id in ConditionExpression below.
         ExpressionAttributeNames: {
-            "#username": "username",
+            "#id": "id",
         },
         ExpressionAttributeValues: {
-            ":username": data.username,
-            ":updatedAt": timestamp,
+            ":id": event.pathParameters.id,
         },
-        UpdateExpression: "SET #username = :username, updatedAt = :updatedAt",
-        ReturnValues: "ALL_NEW",
+        ConditionExpression: "#id = :id",
+        ReturnValues: "ALL_OLD",
     };
     // update the user in the database
-    dynamoDb.update(params, (error, result) => {
+    dynamoDb.delete(params, (error, result) => {
         // handle potential errors
         if (error) {
             console.error(error);

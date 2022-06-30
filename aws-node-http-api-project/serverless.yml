@@ -53,6 +53,17 @@ functions:
       - httpApi:
           path: /users/{id}
           method: put
+          
+  delete:
+    handler: users/delete.delete
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: delete
+          request:
+            parameters:
+              paths:
+                id: true
 
 resources:
   Resources:

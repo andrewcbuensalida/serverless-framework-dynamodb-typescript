@@ -23,4 +23,13 @@ when testing the lambda in aws console, event json has to be in the format below
     {
         "body": "{\"username\": \"George123\"}"
     }
+
+when testing locally,
+    serverless invoke local --function <function name>
+
+To deploy only a specific function
+    serverless deploy --function <function name eg. delete>
     
+
+////////////////////////////////////////
+if you do serverless deploy again before you serverless remove, it won't double the resources, it won't remove the existing resources, just the existing lambdas. It doesn't change the endpoint.
