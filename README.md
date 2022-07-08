@@ -14,12 +14,17 @@ To destroy resources, cd into serverless folder, then
     serverless remove
     OR more specifically
     serverless remove --stage dev --region us-east-1
-    
+Note that it wont delete a resource if the resource has DeletionPolicy: retain
+
+For typescript dynamodb, followed this, but the only thing wrong was their imports, used the import technique from the other folders, and newer versions
+https://github.com/serverless/examples/tree/v3/aws-node-http-api-typescript-dynamodb
+
 
 ////////////////////////////
 workflow
 To convert ts files to js,
     npm run watch
+    
 when testing the lambda in aws console, event json has to be in the format below because json parse
     {
         "body": "{\"username\": \"George123\"}"
@@ -36,3 +41,7 @@ But if changing the serverless.yml, need to do
 
 ////////////////////////////////////////
 if you do serverless deploy again before you serverless remove, it won't double the resources, it won't remove the existing resources, just the existing lambdas. It doesn't change the endpoint.
+
+//////////////////////////////////
+parameters are key values from cli or serverless.yml that are injected into other parts of serverless.yml, useful for secrets.
+variables are dynamic values inserted into serverless.yml. parameters is a type of variable.

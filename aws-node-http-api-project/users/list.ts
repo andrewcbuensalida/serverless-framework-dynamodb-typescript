@@ -4,7 +4,8 @@ import { DynamoDB } from 'aws-sdk'
 
 const dynamoDb = new DynamoDB.DocumentClient()
 const params = {
-  TableName: process.env.DYNAMODB_TABLE,
+	// DYNAMODB_TABLE is from serverless.yml
+	TableName: process.env.DYNAMODB_TABLE,
 };
 
 module.exports.list = (event, context, callback) => {

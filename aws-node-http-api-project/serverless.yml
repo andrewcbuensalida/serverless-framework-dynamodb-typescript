@@ -2,6 +2,8 @@ org: andrewcbuensalida
 app: aws-node-http-api-project
 service: aws-node-http-api-project
 frameworkVersion: '3'
+# need this to use env variable
+useDotenv: true
 
 provider:
   name: aws
@@ -9,6 +11,7 @@ provider:
   region: us-west-1
   lambdaHashingVersion: '20201221'
   environment:
+  # sls are core variables used internally by the framework itself
     DYNAMODB_TABLE: ${self:service}-${sls:stage}
   httpApi:
     cors: true
@@ -25,21 +28,48 @@ provider:
             - dynamodb:DeleteItem
           Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
 
+params:
+# default applies to all stages
+  default:
+  # works even if list is not wrapped in quotes
+    myParam2: 'list'
+  # it automatically goes into prod stage when deploying
+  prod:
+    myParam2: list
+  # when invoking locally, it's in dev stage
+  dev:
+    myParam2: list
+  # can have custom names for stages. then in cli can specify --stage myStage
+  myStage:
+    myParam3: post
+
+# can use ${opt:stage} which will output the stage 
+
+# can use ${cf:anotherService.someOutput} to get aws specific cloudformation output, or s3, or aws, etc.
+
+# another way of declaring variables
+custom:
+  myCustomVar: get
+
 functions:
   create:
-    handler: users/create.create
+  # myParam1 can come from package.json script. if not defined, fallback to 'create'. can only use variables in values, not keys.
+    handler: users/create.${param:myParam1, 'create'}
     events:
       - httpApi:
           path: /users
-          method: post
+          method: ${param:myParam3, 'post'}
 
   list:
-    handler: users/list.list
+  # myParam2 can also come from params block above, depending on which stage option it is. it can also come from dashboard aka console
+    handler: users/list.${param:myParam2}
     events:
       - httpApi:
-          path: /users
-          method: get
+          path: ${env:myVariable2Key}
+          # self refers to this serverless.yml itself. custom comes from above
+          method: ${self:custom.myCustomVar}
 
+# WIP
   get:
     handler: users/get.get
     events:
@@ -47,6 +77,7 @@ functions:
           path: /users/{id}
           method: get
 
+# WIP
   update:
     handler: users/update.update
     events:
@@ -65,7 +96,7 @@ resources:
   Resources:
     UsersDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
+      # DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
           -

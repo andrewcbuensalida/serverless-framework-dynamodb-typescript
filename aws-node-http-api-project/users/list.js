@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const aws_sdk_1 = require("aws-sdk");
 const dynamoDb = new aws_sdk_1.DynamoDB.DocumentClient();
 const params = {
+    // DYNAMODB_TABLE is from serverless.yml
     TableName: process.env.DYNAMODB_TABLE,
 };
 module.exports.list = (event, context, callback) => {
