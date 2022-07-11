@@ -47,6 +47,8 @@ params:
 
 # can use ${cf:anotherService.someOutput} to get aws specific cloudformation output, or s3, or aws, etc.
 
+# reference properties in other json files. use ${file(./myFile.json):someProperty}
+
 # another way of declaring variables
 custom:
   myCustomVar: get
@@ -108,3 +110,6 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+
+plugins:
+  - serverless-offline
